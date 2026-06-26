@@ -12,7 +12,6 @@ import java.util.Scanner;
 public class TodoController {
 
     private final Scanner scanner = new Scanner(System.in);
-
     private final TodoRepository todoRepository;
 
     public TodoController(TodoRepository todoRepository) {
@@ -20,9 +19,9 @@ public class TodoController {
     }
 
     public void start() {
+        clearConsole();
         while (true) {
             printMenu();
-
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1" -> showAllTasks();
@@ -35,13 +34,11 @@ public class TodoController {
                 }
                 default -> System.out.println("Команда не распознана! Введите цифру от 1 до 5.");
             }
-
         }
     }
 
     private void showAllTasks() {
-        System.out.println("\n".repeat(15));
-
+        clearConsole();
         Collection<Task> tasks = todoRepository.getAllTask();
         System.out.println("""
                 +-----------------------------------+
@@ -50,7 +47,9 @@ public class TodoController {
                 """);
 
         if (tasks.isEmpty()) {
+            clearConsole();
             System.out.println("[Инфо] Ваш список дел пока пуст. Добавьте первую задачу!");
+            return;
         }
 
         for (Task task : tasks) {
@@ -60,7 +59,7 @@ public class TodoController {
     }
 
     private void createTask() {
-        System.out.println("\n".repeat(15));
+        clearConsole();
         System.out.println("""
                 +-----------------------------------+
                 |      ДОБАВЛЕНИЕ НОВОЙ ЗАДАЧИ      |
@@ -75,24 +74,81 @@ public class TodoController {
         System.out.print("» ");
         String description = scanner.nextLine();
 
-        Task task = new Task(name, description);
-        todoRepository.createTask(task);
-
+        todoRepository.createTask(new Task(name, description));
         System.out.println("[Успешно] Задача создана и сохранена.");
     }
 
     private void updateTask() {
-        System.out.println("Заглушка");
+        clearConsole();
+        System.out.println("""
+                +-----------------------------------+
+                |      ИЗМЕНЕНИЕ СТАТУСА ЗАДАЧИ     |
+                +-----------------------------------+
+                """);
+
+        if (todoRepository.getAllTask().isEmpty()) {
+            System.out.println("[Инфо] Ваш список дел пуст. Нечего изменять!");
+            return;
+        }
+
+        int id = readInt("Введите номер задачи » ");
+        Task task = todoRepository.getTaskById(id);
+
+        if (task == null) {
+            System.out.println("[Ошибка] Задача с №" + id + " не найдена!");
+            return;
+        }
+
+        task.setCompleted(!task.isCompleted());
+        todoRepository.updateTask(task);
+        System.out.println("[Успешно] Статус задачи №" + id + " изменен.");
     }
 
     private void deleteTask() {
-        System.out.println("Заглушка");
+        System.out.println("""
+                +-----------------------------------+
+                |          УДАЛЕНИЕ ЗАДАЧИ          |
+                +-----------------------------------+
+                """);
+
+        if (todoRepository.getAllTask().isEmpty()) {
+            System.out.println("[Инфо] Ваш список дел пуст. Нечего удалять!");
+            return;
+        }
+
+        int id = readInt("Введите номер задачи для удаления » ");
+        Task task = todoRepository.getTaskById(id);
+
+        if (task == null) {
+            System.out.println("[Ошибка] Задача с №" + id + " не найдена!");
+            return;
+        }
+
+        todoRepository.deleteTaskById(task.getId());
+        System.out.println("[Успешно] Задача №" + id + " («" + task.getName() + "») удалена.");
+    }
+
+    private int readInt(String promptMessage) {
+        while (true) {
+            System.out.print(promptMessage);
+            String input = scanner.nextLine();
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("[Ошибка] Неверный формат! Пожалуйста, вводите только цифры.");
+                System.out.println("--------------------------------------------------");
+            }
+        }
+    }
+
+    private void clearConsole() {
+        System.out.println("\n".repeat(15));
     }
 
     private void printMenu() {
         System.out.println("""
                 =========================================
-                              СПИСОК ДЕЛ
+                |              СПИСОК ДЕЛ               |
                 =========================================
                  [1] Показать все задачи
                  [2] Добавить новую задачу
