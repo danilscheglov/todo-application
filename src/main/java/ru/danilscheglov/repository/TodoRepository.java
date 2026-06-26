@@ -30,11 +30,7 @@ public class TodoRepository {
     }
 
     public void updateTask(Task task) {
-        if (tasks.containsKey(task.getId())) {
-            tasks.put(task.getId(), task);
-        } else {
-            System.out.println("Задача" + task.getId() + " не найдена!");
-        }
+        tasks.put(task.getId(), task);
     }
 
     public void deleteTaskById(int id) {
