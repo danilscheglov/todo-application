@@ -11,8 +11,8 @@
 Откройте терминал и выполните команду:
 
 ```bash
-git clone [https://github.com/ваш-логин/название-репозитория.git](https://github.com/ваш-логин/название-репозитория.git)
-cd название-репозитория
+git clone https://github.com/danilscheglov/todo-application.git
+cd todo-application
 ```
 
 ### 2 Сборка JAR-файла
@@ -30,5 +30,5 @@ mvn clean package
 После того как вы выполнили сборку `mvn clean package`, программу можно запустить напрямую через Java из папки `target`:
 
 ```bash
-java -jar target/название-вашего-файла.jar
+java -jar target/todo-application-1.0-SNAPSHOT.jar
 ```
