@@ -3,6 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
+tasks.txt
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
