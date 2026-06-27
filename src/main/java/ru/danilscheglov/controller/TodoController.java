@@ -6,6 +6,11 @@ import ru.danilscheglov.service.TodoService;
 import java.util.Collection;
 import java.util.Scanner;
 
+import static ru.danilscheglov.util.InputUtil.readInt;
+import static ru.danilscheglov.util.UiRenderer.checkEmpty;
+import static ru.danilscheglov.util.UiRenderer.printOperationsResult;
+import static ru.danilscheglov.util.UiUtil.*;
+
 /**
  * @author Danil Scheglov
  */
@@ -42,16 +47,9 @@ public class TodoController {
     private void showAllTasks() {
         clearConsole();
         Collection<Task> tasks = todoService.getAllTasks();
-        System.out.println("""
-                +-----------------------------------+
-                |          СПИСОК ВСЕХ ЗАДАЧ        |
-                +-----------------------------------+
-                """);
+        System.out.println(HEADER_ALL);
 
-        if (tasks.isEmpty()) {
-            System.out.println("[Инфо] Ваш список дел пока пуст. Добавьте первую задачу!");
-            return;
-        }
+        if (checkEmpty(tasks, INFO_EMPTY)) return;
 
         for (Task task : tasks) {
             String statusMarker = task.isCompleted() ? "[X]" : "[ ]";
@@ -61,11 +59,7 @@ public class TodoController {
 
     private void createTask() {
         clearConsole();
-        System.out.println("""
-                +-----------------------------------+
-                |      ДОБАВЛЕНИЕ НОВОЙ ЗАДАЧИ      |
-                +-----------------------------------+
-                """);
+        System.out.println(HEADER_CREATE);
 
         System.out.println("Шаг 1. Введите название задачи:");
         System.out.print("» ");
@@ -81,19 +75,11 @@ public class TodoController {
 
     private void updateTask() {
         clearConsole();
-        System.out.println("""
-                +-----------------------------------+
-                |      ИЗМЕНЕНИЕ СТАТУСА ЗАДАЧИ     |
-                +-----------------------------------+
-                """);
+        System.out.println(HEADER_UPDATE);
 
-        if (todoService.getAllTasks().isEmpty()) {
-            System.out.println("[Инфо] Ваш список дел пуст. Нечего изменять!");
-            return;
-        }
+        if (checkEmpty(todoService.getAllTasks(), INFO_NOTHING_TO_CHANGE)) return;
 
-        int id = readInt("Введите номер задачи » ");
-
+        int id = readInt(scanner, "Введите номер задачи » ");
         boolean success = todoService.toggleTaskStatus(id);
 
         if (success) {
@@ -101,45 +87,28 @@ public class TodoController {
         } else {
             System.out.println("[Ошибка] Задача с №" + id + " не найдена!");
         }
+        printOperationsResult(success, successUpdate(id), errorNotFound(id));
     }
 
     private void deleteTask() {
-        System.out.println("""
-                +-----------------------------------+
-                |          УДАЛЕНИЕ ЗАДАЧИ          |
-                +-----------------------------------+
-                """);
+        clearConsole();
+        System.out.println(HEADER_DELETE);
 
-        if (todoService.getAllTasks().isEmpty()) {
-            System.out.println("[Инфо] Ваш список дел пуст. Нечего удалять!");
-            return;
-        }
+        if (checkEmpty(todoService.getAllTasks(), INFO_NOTHING_TO_DELETE)) return;
 
-        int id = readInt("Введите номер задачи для удаления » ");
+        int id = readInt(scanner, "Введите номер задачи для удаления » ");
         boolean success = todoService.deleteTask(id);
 
-        if (!success) {
-            System.out.println("[Ошибка] Задача с №" + id + " не найдена!");
-            return;
-        }
-
-        System.out.println("[Успешно] Задача №" + id + " удалена.");
+        printOperationsResult(success, successDelete(id), errorNotFound(id));
     }
 
     private void showActiveTasks() {
         clearConsole();
         Collection<Task> tasks = todoService.getActiveTasks();
 
-        System.out.println("""
-                +-----------------------------------+
-                |       СПИСОК АКТИВНЫХ ЗАДАЧ       |
-                +-----------------------------------+
-                """);
+        System.out.println(HEADER_ACTIVE);
 
-        if (tasks.isEmpty()) {
-            System.out.println("[Инфо] У вас нет активных задач. Отличная работа!");
-            return;
-        }
+        if (checkEmpty(tasks, INFO_NO_ACTIVE)) return;
 
         for (Task task : tasks) {
             System.out.println(task.getId() + ". [ ] " + task.getName() + " - " + task.getDescription());
@@ -149,54 +118,17 @@ public class TodoController {
     private void showCompletedTasks() {
         clearConsole();
         Collection<Task> tasks = todoService.getCompletedTasks();
+        System.out.println(HEADER_COMPLETED);
 
-        System.out.println("""
-                +-----------------------------------+
-                |     СПИСОК ВЫПОЛНЕННЫХ ЗАДАЧ      |
-                +-----------------------------------+
-                """);
-
-        if (tasks.isEmpty()) {
-            System.out.println("[Инфо] Вы пока не выполнили ни одной задачи. Время начать!");
-            return;
-        }
+        if (checkEmpty(tasks, INFO_NO_COMPLETED)) return;
 
         for (Task task : tasks) {
             System.out.println(task.getId() + ". [X] " + task.getName() + " - " + task.getDescription());
         }
     }
 
-    private int readInt(String promptMessage) {
-        while (true) {
-            System.out.print(promptMessage);
-            String input = scanner.nextLine();
-            try {
-                return Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("[Ошибка] Неверный формат! Пожалуйста, вводите только цифры.");
-                System.out.println("--------------------------------------------------");
-            }
-        }
-    }
-
-    private void clearConsole() {
-        System.out.println("\n".repeat(15));
-    }
-
     private void printMenu() {
-        System.out.println("""
-                =========================================
-                |              СПИСОК ДЕЛ               |
-                =========================================
-                 [1] Показать все задачи
-                 [2] Добавить новую задачу
-                 [3] Изменить задачу
-                 [4] Удалить задачу
-                 [5] Показать только АКТИВНЫЕ задачи
-                 [6] Показать только ВЫПОЛНЕННЫЕ задачи
-                 [0] Выйти из приложения
-                =========================================
-                """);
+        System.out.println(MAIN_MENU);
         System.out.print("Выберите действие » ");
     }
 }
