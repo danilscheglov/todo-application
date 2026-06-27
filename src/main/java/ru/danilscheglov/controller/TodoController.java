@@ -28,7 +28,9 @@ public class TodoController {
                 case "2" -> createTask();
                 case "3" -> updateTask();
                 case "4" -> deleteTask();
-                case "5" -> {
+                case "5" -> showActiveTasks();
+                case "6" -> showCompletedTasks();
+                case "0" -> {
                     System.out.println("До скорой встречи!");
                     System.exit(0);
                 }
@@ -124,6 +126,46 @@ public class TodoController {
         System.out.println("[Успешно] Задача №" + id + " удалена.");
     }
 
+    private void showActiveTasks() {
+        clearConsole();
+        Collection<Task> tasks = todoService.getActiveTasks();
+
+        System.out.println("""
+                +-----------------------------------+
+                |       СПИСОК АКТИВНЫХ ЗАДАЧ       |
+                +-----------------------------------+
+                """);
+
+        if (tasks.isEmpty()) {
+            System.out.println("[Инфо] У вас нет активных задач. Отличная работа!");
+            return;
+        }
+
+        for (Task task : tasks) {
+            System.out.println(task.getId() + ". [ ] " + task.getName() + " - " + task.getDescription());
+        }
+    }
+
+    private void showCompletedTasks() {
+        clearConsole();
+        Collection<Task> tasks = todoService.getCompletedTasks();
+
+        System.out.println("""
+                +-----------------------------------+
+                |     СПИСОК ВЫПОЛНЕННЫХ ЗАДАЧ      |
+                +-----------------------------------+
+                """);
+
+        if (tasks.isEmpty()) {
+            System.out.println("[Инфо] Вы пока не выполнили ни одной задачи. Время начать!");
+            return;
+        }
+
+        for (Task task : tasks) {
+            System.out.println(task.getId() + ". [X] " + task.getName() + " - " + task.getDescription());
+        }
+    }
+
     private int readInt(String promptMessage) {
         while (true) {
             System.out.print(promptMessage);
@@ -150,7 +192,9 @@ public class TodoController {
                  [2] Добавить новую задачу
                  [3] Изменить задачу
                  [4] Удалить задачу
-                 [5] Выйти из приложения
+                 [5] Показать только АКТИВНЫЕ задачи
+                 [6] Показать только ВЫПОЛНЕННЫЕ задачи
+                 [0] Выйти из приложения
                 =========================================
                 """);
         System.out.print("Выберите действие » ");

@@ -4,6 +4,7 @@ import ru.danilscheglov.model.Task;
 import ru.danilscheglov.repository.TodoRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Danil Scheglov
@@ -44,5 +45,17 @@ public class TodoService {
 
         todoRepository.deleteTaskById(id);
         return true;
+    }
+
+    public List<Task> getActiveTasks() {
+        return todoRepository.getAllTask().stream()
+                .filter(task -> !task.isCompleted())
+                .toList();
+    }
+
+    public List<Task> getCompletedTasks() {
+        return todoRepository.getAllTask().stream()
+                .filter(Task::isCompleted)
+                .toList();
     }
 }
