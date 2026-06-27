@@ -1,7 +1,7 @@
 package ru.danilscheglov.controller;
 
 import ru.danilscheglov.model.Task;
-import ru.danilscheglov.repository.TodoRepository;
+import ru.danilscheglov.service.TodoService;
 
 import java.util.Collection;
 import java.util.Scanner;
@@ -12,10 +12,10 @@ import java.util.Scanner;
 public class TodoController {
 
     private final Scanner scanner = new Scanner(System.in);
-    private final TodoRepository todoRepository;
+    private final TodoService todoService;
 
-    public TodoController(TodoRepository todoRepository) {
-        this.todoRepository = todoRepository;
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
     }
 
     public void start() {
@@ -39,7 +39,7 @@ public class TodoController {
 
     private void showAllTasks() {
         clearConsole();
-        Collection<Task> tasks = todoRepository.getAllTask();
+        Collection<Task> tasks = todoService.getAllTasks();
         System.out.println("""
                 +-----------------------------------+
                 |          СПИСОК ВСЕХ ЗАДАЧ        |
@@ -47,7 +47,6 @@ public class TodoController {
                 """);
 
         if (tasks.isEmpty()) {
-            clearConsole();
             System.out.println("[Инфо] Ваш список дел пока пуст. Добавьте первую задачу!");
             return;
         }
@@ -74,7 +73,7 @@ public class TodoController {
         System.out.print("» ");
         String description = scanner.nextLine();
 
-        todoRepository.createTask(new Task(name, description));
+        todoService.createTask(name, description);
         System.out.println("[Успешно] Задача создана и сохранена.");
     }
 
@@ -86,22 +85,20 @@ public class TodoController {
                 +-----------------------------------+
                 """);
 
-        if (todoRepository.getAllTask().isEmpty()) {
+        if (todoService.getAllTasks().isEmpty()) {
             System.out.println("[Инфо] Ваш список дел пуст. Нечего изменять!");
             return;
         }
 
         int id = readInt("Введите номер задачи » ");
-        Task task = todoRepository.getTaskById(id);
 
-        if (task == null) {
+        boolean success = todoService.toggleTaskStatus(id);
+
+        if (success) {
+            System.out.println("[Успешно] Статус задачи №" + id + " изменен.");
+        } else {
             System.out.println("[Ошибка] Задача с №" + id + " не найдена!");
-            return;
         }
-
-        task.setCompleted(!task.isCompleted());
-        todoRepository.updateTask(task);
-        System.out.println("[Успешно] Статус задачи №" + id + " изменен.");
     }
 
     private void deleteTask() {
@@ -111,21 +108,20 @@ public class TodoController {
                 +-----------------------------------+
                 """);
 
-        if (todoRepository.getAllTask().isEmpty()) {
+        if (todoService.getAllTasks().isEmpty()) {
             System.out.println("[Инфо] Ваш список дел пуст. Нечего удалять!");
             return;
         }
 
         int id = readInt("Введите номер задачи для удаления » ");
-        Task task = todoRepository.getTaskById(id);
+        boolean success = todoService.deleteTask(id);
 
-        if (task == null) {
+        if (!success) {
             System.out.println("[Ошибка] Задача с №" + id + " не найдена!");
             return;
         }
 
-        todoRepository.deleteTaskById(task.getId());
-        System.out.println("[Успешно] Задача №" + id + " («" + task.getName() + "») удалена.");
+        System.out.println("[Успешно] Задача №" + id + " удалена.");
     }
 
     private int readInt(String promptMessage) {
