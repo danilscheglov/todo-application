@@ -1,5 +1,6 @@
 package ru.danilscheglov.controller;
 
+import ru.danilscheglov.exception.TodoApplicationException;
 import ru.danilscheglov.model.Task;
 import ru.danilscheglov.service.TodoService;
 
@@ -8,7 +9,6 @@ import java.util.Scanner;
 
 import static ru.danilscheglov.util.InputUtil.readInt;
 import static ru.danilscheglov.util.UiRenderer.checkEmpty;
-import static ru.danilscheglov.util.UiRenderer.printOperationsResult;
 import static ru.danilscheglov.util.UiUtil.*;
 
 /**
@@ -26,20 +26,28 @@ public class TodoController {
     public void start() {
         clearConsole();
         while (true) {
-            printMenu();
-            String choice = scanner.nextLine();
-            switch (choice) {
-                case "1" -> showAllTasks();
-                case "2" -> createTask();
-                case "3" -> updateTask();
-                case "4" -> deleteTask();
-                case "5" -> showActiveTasks();
-                case "6" -> showCompletedTasks();
-                case "0" -> {
-                    System.out.println("До скорой встречи!");
-                    System.exit(0);
+            try {
+                printMenu();
+                String choice = scanner.nextLine();
+                switch (choice) {
+                    case "1" -> showAllTasks();
+                    case "2" -> createTask();
+                    case "3" -> updateTask();
+                    case "4" -> deleteTask();
+                    case "5" -> showActiveTasks();
+                    case "6" -> showCompletedTasks();
+                    case "0" -> {
+                        System.out.println("До скорой встречи!");
+                        System.exit(0);
+                    }
+                    default -> System.out.println("Команда не распознана! Введите цифру от 1 до 6.");
                 }
-                default -> System.out.println("Команда не распознана! Введите цифру от 1 до 5.");
+            } catch (TodoApplicationException e) {
+                System.out.println(e.getMessage());
+                System.out.println("--------------------------------------------------");
+            } catch (Exception e) {
+                System.out.println("[Критическая ошибка] Что-то пошло не так: " + e.getMessage());
+                System.out.println("--------------------------------------------------");
             }
         }
     }
@@ -80,14 +88,8 @@ public class TodoController {
         if (checkEmpty(todoService.getAllTasks(), INFO_NOTHING_TO_CHANGE)) return;
 
         int id = readInt(scanner, "Введите номер задачи » ");
-        boolean success = todoService.toggleTaskStatus(id);
-
-        if (success) {
-            System.out.println("[Успешно] Статус задачи №" + id + " изменен.");
-        } else {
-            System.out.println("[Ошибка] Задача с №" + id + " не найдена!");
-        }
-        printOperationsResult(success, successUpdate(id), errorNotFound(id));
+        todoService.toggleTaskStatus(id);
+        System.out.println(successUpdate(id));
     }
 
     private void deleteTask() {
@@ -97,15 +99,13 @@ public class TodoController {
         if (checkEmpty(todoService.getAllTasks(), INFO_NOTHING_TO_DELETE)) return;
 
         int id = readInt(scanner, "Введите номер задачи для удаления » ");
-        boolean success = todoService.deleteTask(id);
-
-        printOperationsResult(success, successDelete(id), errorNotFound(id));
+        todoService.deleteTask(id);
+        System.out.println(successDelete(id));
     }
 
     private void showActiveTasks() {
         clearConsole();
         Collection<Task> tasks = todoService.getActiveTasks();
-
         System.out.println(HEADER_ACTIVE);
 
         if (checkEmpty(tasks, INFO_NO_ACTIVE)) return;

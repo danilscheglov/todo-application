@@ -1,5 +1,6 @@
 package ru.danilscheglov.service;
 
+import ru.danilscheglov.exception.TaskNotFoundException;
 import ru.danilscheglov.model.Task;
 import ru.danilscheglov.repository.TodoRepository;
 
@@ -26,25 +27,20 @@ public class TodoService {
         todoRepository.createTask(task);
     }
 
-    public boolean toggleTaskStatus(int id) {
+    public void toggleTaskStatus(int id) {
         Task task = todoRepository.getTaskById(id);
         if (task == null) {
-            return false;
+            throw new TaskNotFoundException(id);
         }
-
         task.setCompleted(!task.isCompleted());
         todoRepository.updateTask(task);
-        return true;
     }
 
-    public boolean deleteTask(int id) {
-        Task task = todoRepository.getTaskById(id);
-        if (task == null) {
-            return false;
+    public void deleteTask(int id) {
+        if (todoRepository.getTaskById(id) == null) {
+            throw new TaskNotFoundException(id);
         }
-
         todoRepository.deleteTaskById(id);
-        return true;
     }
 
     public List<Task> getActiveTasks() {

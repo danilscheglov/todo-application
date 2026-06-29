@@ -23,12 +23,4 @@ public final class UiRenderer {
         }
         return false;
     }
-
-    public static void printOperationsResult(boolean success, String successMessage, String errorMessage) {
-        if (success) {
-            System.out.println(successMessage);
-        } else {
-            System.out.println(errorMessage);
-        }
-    }
 }
