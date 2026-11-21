@@ -2,22 +2,24 @@ package ru.danilscheglov.todo;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
+import static ru.danilscheglov.todo.ui.UiConstants.*;
 
 public class TodoApplication extends Application {
 
     @Override
     public void start(Stage stage) {
-        Label label = new Label("Привет, JavaFX!");
+        StackPane root = new StackPane();
+        Scene scene = new Scene(root, WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT);
 
-        StackPane root = new StackPane(label);
-        Scene scene = new Scene(root, 400, 300);
-
-        stage.setTitle("Todo App");
+        stage.setTitle(APP_TITLE);
+        stage.setMinWidth(WINDOW_MIN_WIDTH);
+        stage.setMinHeight(WINDOW_MIN_HEIGHT);
         stage.setScene(scene);
         stage.show();
+        stage.centerOnScreen();
     }
 
     public static void main(String[] args) {
