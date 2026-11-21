@@ -19,20 +19,21 @@ git clone https://github.com/danilscheglov/todo-application
 cd todo-application
 ```
 
-2. Подготовьте базу данных:
+2. Настройте переменные окружения и конфигурацию приложения:
 
-Создайте базу данных `todo_db` в PostgreSQL и примените схему таблиц из `src/main/resources/db/schema.sql`
+Скопируйте шаблоны конфигурации в локальные файлы и при необходимости измените параметры подключения:
 
 ```bash
-psql -U postgres -d todo_db -f src/main/resources/db/schema.sql
+cp .env.example .env
+cp src/main/resources/application.properties src/main/resources/application-dev.properties
 ```
 
-3. Настройте подключение к БД:
+3. Запустите базу данных PostgreSQL в Docker:
 
-Скопируйте шаблон конфигурации в локальный файл и укажите свои параметры подключения:
+При первом запуске схема таблиц из `src/main/resources/db/schema.sql` применится автоматически:
 
 ```bash
-cp src/main/resources/application.properties src/main/resources/application-dev.properties
+docker compose up -d
 ```
 
 4. Запустите приложение
