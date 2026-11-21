@@ -6,8 +6,9 @@
 
 - **Язык:** Java 21
 - **GUI:** JavaFX 21
-- **База данных:** PostgreSQL
+- **База данных:** PostgreSQL 17
 - **Доступ к данным:** JDBC, HikariCP
+- **Инфраструктура:** Docker, Docker Compose
 - **Сборка:** Apache Maven
 
 ## Установка и запуск
