@@ -22,12 +22,13 @@
     </developers>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>21.0.6</javafx.version>
+        <javafx.version>27.0.1</javafx.version>
         <postgresql.version>42.7.14</postgresql.version>
         <hikari.version>7.1.0</hikari.version>
+        <atlantafx.version>3.0.0</atlantafx.version>
     </properties>
 
     <dependencies>
@@ -48,6 +49,12 @@
             <artifactId>HikariCP</artifactId>
             <version>${hikari.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>${atlantafx.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -58,6 +65,9 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>ru.danilscheglov.todo.TodoApplication</mainClass>
+                    <options>
+                        <option>--enable-native-access=javafx.graphics</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>
